@@ -30,6 +30,8 @@ export interface SiteConfig {
   instagram: string;
   tiktok: string;
   facebook: string;
+  /** Full channel URL, e.g. https://www.youtube.com/c/locosporelhardware */
+  youtube?: string;
   /** International format without "+", e.g. 5491112345678. Empty = hide WhatsApp. */
   whatsapp: string;
   zone: string;

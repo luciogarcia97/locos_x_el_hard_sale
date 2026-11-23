@@ -6,6 +6,9 @@
   <!-- relative base so the site works on any host or sub-path (GitHub Pages, Netlify, Cloudflare…) -->
   <base href="./">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Only our own scripts may run; data can only be sent to GitHub and the login Worker.
+       If the Worker URL changes, update connect-src too. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://raw.githubusercontent.com https://avatars.githubusercontent.com; connect-src 'self' https://api.github.com https://garage-sale-auth.luciopeke.workers.dev; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="description" content="Teclados, auriculares y más: productos de review y usados de Locos por el Hardware.">
   <meta name="theme-color" content="#0a0712">
   <meta property="og:title" content="Garage Sale · Locos por el Hardware">

@@ -44,6 +44,14 @@
       <section class="hero-panel hero-panel-socials" aria-label="Redes y entrega">
         @if (cfg) {
           <ul class="social-list">
+          @if (cfg.youtube) {
+            <li>
+              <a [href]="cfg.youtube" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15.1V8.9l5.8 3.1-5.8 3.1z"/></svg>
+                Locos por el Hardware
+              </a>
+            </li>
+          }
             <li>
               <a [href]="'https://instagram.com/' + cfg.instagram" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4zM17.3 5.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zM12 2c-2.7 0-3.1 0-4.1.1C4.4 2.2 2.2 4.4 2.1 7.9 2 8.9 2 9.3 2 12s0 3.1.1 4.1c.1 3.5 2.3 5.7 5.8 5.8 1 .1 1.4.1 4.1.1s3.1 0 4.1-.1c3.5-.1 5.7-2.3 5.8-5.8.1-1 .1-1.4.1-4.1s0-3.1-.1-4.1c-.1-3.5-2.3-5.7-5.8-5.8C15.1 2 14.7 2 12 2zm0 1.8c2.7 0 3 0 4 .1 2.5.1 3.9 1.5 4 4 .1 1 .1 1.3.1 4s0 3-.1 4c-.1 2.5-1.5 3.9-4 4-1 .1-1.3.1-4 .1s-3 0-4-.1c-2.5-.1-3.9-1.5-4-4-.1-1-.1-1.3-.1-4s0-3 .1-4c.1-2.5 1.5-3.9 4-4 1-.1 1.3-.1 4-.1z"/></svg>
@@ -121,6 +129,9 @@
         <p>Esto no es una tienda online: las ventas se coordinan por mensaje privado con Locos por el Hardware.</p>
         @if (cfg) {
           <nav class="footer-socials" aria-label="Redes">
+            @if (cfg.youtube) {
+              <a [href]="cfg.youtube" target="_blank" rel="noopener">YouTube</a>
+            }
             <a [href]="'https://instagram.com/' + cfg.instagram" target="_blank" rel="noopener">Instagram</a>
             <a [href]="'https://tiktok.com/@' + cfg.tiktok" target="_blank" rel="noopener">TikTok</a>
             <a [href]="'https://facebook.com/' + cfg.facebook" target="_blank" rel="noopener">Facebook</a>

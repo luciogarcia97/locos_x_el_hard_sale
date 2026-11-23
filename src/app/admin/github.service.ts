@@ -128,7 +128,19 @@ export class GithubService {
       throw new SessionExpired();
     }
     if (res.status === 403) {
-      throw new Error('GitHub rechazó el cambio. Revisá que tu cuenta sea colaboradora del repositorio y que la GitHub App esté instalada en él.');
+      const reason = ((await res.json().catch(() => null)) as { message?: string } | null)?.message ?? '';
+      if (/not accessible by integration/i.test(reason)) {
+        throw new Error(
+          'GitHub rechazó el cambio: la GitHub App no tiene permiso de escritura en este repositorio. ' +
+            'Revisá que esté instalada en el repo y que "Contents" sea "Read and write" (y aceptá el permiso nuevo en la instalación). Después tocá Salir e ingresá de nuevo.',
+        );
+      }
+      if (/rate limit/i.test(reason)) {
+        throw new Error('GitHub frenó los pedidos por exceso de uso. Esperá unos minutos y probá de nuevo.');
+      }
+      throw new Error(
+        `GitHub rechazó el cambio. Revisá que tu cuenta sea colaboradora del repositorio y que la GitHub App esté instalada en él.${reason ? ` (GitHub: ${reason})` : ''}`,
+      );
     }
     if (res.status === 404) throw new Error('No se encontró el repositorio, la rama o el archivo de productos. Revisá github.owner / github.repo / github.branch en config.json.');
     if (res.status === 409 || res.status === 422) throw new Error('GitHub no aceptó el cambio porque el repositorio se actualizó. Recargá el panel y probá de nuevo.');
