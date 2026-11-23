@@ -2,6 +2,7 @@ import { Injectable, computed, effect, signal } from '@angular/core';
 import { Product, SiteConfig, formatPrice } from './models';
 
 const FAVORITES_KEY = 'loh-favorites';
+const INTEREST_KEY = 'loh-interest-sent';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
@@ -61,6 +62,37 @@ export class CatalogService {
     const intro = this.config()?.messageTemplate ?? '¡Hola! Me interesa:';
     const lines = items.map((p) => `• ${p.name} (${formatPrice(p.price)})`);
     return [intro, ...lines].join('\n');
+  }
+
+  /**
+   * Anonymous "Me interesa" counter (see worker/): only the product id is sent, at most once per
+   * product per browser per day. Fire-and-forget: failures never bother the visitor.
+   */
+  trackInterest(ids: string[]) {
+    const worker = this.config()?.auth?.workerUrl;
+    if (!worker || !ids.length) return;
+    const today = new Date().toISOString().slice(0, 10);
+    let seen: Record<string, string> = {};
+    try {
+      seen = JSON.parse(localStorage.getItem(INTEREST_KEY) ?? '{}');
+    } catch {
+      /* storage blocked: count anyway */
+    }
+    const fresh = ids.filter((id) => seen[id] !== today);
+    if (!fresh.length) return;
+    fresh.forEach((id) => (seen[id] = today));
+    try {
+      localStorage.setItem(INTEREST_KEY, JSON.stringify(seen));
+    } catch {
+      /* ignore */
+    }
+    // text/plain keeps it a "simple" request (no CORS preflight)
+    fetch(`${worker.replace(/\/$/, '')}/interest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ ids: fresh }),
+      keepalive: true,
+    }).catch(() => {});
   }
 
   private readFavorites(): Set<string> {

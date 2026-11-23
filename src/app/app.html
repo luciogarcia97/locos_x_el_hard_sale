@@ -114,7 +114,7 @@
     } @else {
       <section class="grid">
         @for (p of visible(); track p.id) {
-          <app-product-card [product]="p" (open)="selected.set($event)" (interest)="openContact($event)" />
+          <app-product-card [product]="p" (open)="openDetail($event)" (interest)="openContact($event)" />
         } @empty {
           <p class="state">No hay productos con esos filtros.</p>
         }
@@ -154,7 +154,7 @@
   }
 
   @if (selected(); as p) {
-    <app-product-detail [product]="p" (close)="selected.set(null)" (interest)="openContact($event)" />
+    <app-product-detail [product]="p" (close)="closeDetail()" (interest)="openContact($event)" />
   }
 
   @if (contactItems(); as items) {

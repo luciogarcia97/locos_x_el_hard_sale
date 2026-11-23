@@ -22,6 +22,8 @@ export interface Product {
   description: string;
   /** Optional link to the YouTube/TikTok review of the product */
   reviewUrl?: string;
+  /** ISO date set by the admin panel when the product is marked as sold */
+  soldAt?: string;
 }
 
 export interface SiteConfig {
@@ -30,6 +32,8 @@ export interface SiteConfig {
   instagram: string;
   tiktok: string;
   facebook: string;
+  /** Sold products are hidden this many days after being sold (default 15). */
+  hideSoldAfterDays?: number;
   /** Full channel URL, e.g. https://www.youtube.com/c/locosporelhardware */
   youtube?: string;
   /** International format without "+", e.g. 5491112345678. Empty = hide WhatsApp. */

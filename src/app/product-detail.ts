@@ -10,7 +10,9 @@ import { ProductImage } from './product-image';
     @let p = product();
     <div class="backdrop" (click)="close.emit()"></div>
     <div class="dialog dialog-wide" role="dialog" aria-modal="true" [attr.aria-label]="p.name">
+      <!-- the close button lives outside the scrolling area, so it stays put while you scroll -->
       <button class="close" type="button" (click)="close.emit()" aria-label="Cerrar">✕</button>
+      <div class="dialog-scroll">
 
       <div class="detail">
         <div class="gallery">
@@ -67,8 +69,12 @@ import { ProductImage } from './product-image';
             @if (p.reviewUrl) {
               <a class="btn btn-ghost" [href]="p.reviewUrl" target="_blank" rel="noopener">▶ Ver la review</a>
             }
+            <button class="btn btn-ghost" type="button" (click)="share()">
+              {{ shared() ? '✓ Link copiado' : 'Compartir' }}
+            </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   `,
@@ -81,8 +87,31 @@ export class ProductDetail {
   readonly interest = output<Product[]>();
 
   protected readonly index = signal(0);
+  protected readonly shared = signal(false);
   protected readonly price = computed(() => formatPrice(this.product().price));
   protected readonly isFav = computed(() => this.catalog.favorites().has(this.product().id));
+
+  /** Native share sheet on phones; copies the link elsewhere. */
+  protected async share() {
+    const p = this.product();
+    const url = `${location.origin}${location.pathname}#p/${encodeURIComponent(p.id)}`;
+    const text = `${p.name}, ${this.price()} en la Garage Sale de Locos por el Hardware`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: p.name, text, url });
+        return;
+      } catch (e) {
+        if ((e as DOMException).name === 'AbortError') return; // closed the share sheet
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      this.shared.set(true);
+      setTimeout(() => this.shared.set(false), 2500);
+    } catch {
+      prompt('Copiá el link del producto:', url);
+    }
+  }
 
   protected step(delta: number) {
     const n = this.product().images.length;

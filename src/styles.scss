@@ -318,7 +318,8 @@ app-product-card { display: block; }
   background: linear-gradient(var(--panel), var(--panel)) padding-box, var(--edge) border-box;
   box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .8), 0 0 60px -20px rgba(255, 62, 181, .35);
 }
-.dialog-wide { width: min(980px, calc(100vw - 32px)); padding: 0; }
+.dialog-wide { width: min(980px, calc(100vw - 32px)); padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.dialog-scroll { overflow-y: auto; overscroll-behavior: contain; max-height: calc(100dvh - 32px); border-radius: inherit; }
 .dialog h2 { font-family: var(--display); font-weight: 900; font-size: 2.3rem; line-height: .98; padding-right: 40px; }
 .dialog > .muted { margin-top: 10px; font-size: .98rem; color: var(--text-2); }
 .close {
@@ -455,6 +456,7 @@ app-product-card { display: block; }
 .adm-row-info { display: grid; min-width: 0; }
 .adm-row-info strong { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .adm-price { font-family: var(--display); font-weight: 800; font-size: 1.3rem; color: var(--yellow); font-variant-numeric: tabular-nums; }
+.adm-interest { display: block; font-family: var(--body); font-size: .74rem; font-weight: 600; color: var(--pink); }
 .adm .adm-status { padding: 7px 10px; font-weight: 600; text-transform: capitalize; }
 .adm .adm-status.status-disponible { color: var(--ok); }
 .adm .adm-status.status-reservado { color: var(--yellow); }

@@ -12,6 +12,12 @@ type Sort = 'destacados' | 'precio-asc' | 'precio-desc';
 /** Hash routes, so the site works on any static host without server rewrites. */
 type Route = 'home' | 'admin' | 'login';
 
+/** #p/<id> opens that product's detail on the public page. */
+const productIdFromHash = (): string | null =>
+  location.hash.startsWith('#p/') ? decodeURIComponent(location.hash.slice(3)) || null : null;
+
+const DAY = 86_400_000;
+
 const routeFromHash = (): Route => {
   if (location.hash === '#admin') return 'admin';
   // coming back from GitHub (?code=…): show the login screen while the session is created
@@ -38,12 +44,27 @@ export class App {
 
   private readonly hero = viewChild<ElementRef<HTMLElement>>('hero');
 
-  protected readonly selected = signal<Product | null>(null);
+  private readonly productId = signal<string | null>(productIdFromHash());
+  /** true when the detail was opened from this page (so "back" can close it) */
+  private detailPushed = false;
+  protected readonly selected = computed(() => {
+    const id = this.productId();
+    return id ? (this.catalog.products().find((p) => p.id === id) ?? null) : null;
+  });
+
+  /** Sold items disappear on their own a while after being sold (config.hideSoldAfterDays, default 15). */
+  protected readonly listed = computed(() => {
+    const days = this.catalog.config()?.hideSoldAfterDays ?? 15;
+    const cutoff = Date.now() - days * DAY;
+    return this.catalog
+      .products()
+      .filter((p) => !(p.status === 'vendido' && p.soldAt && Date.parse(p.soldAt) < cutoff));
+  });
   protected readonly contactItems = signal<Product[] | null>(null);
 
   protected readonly categories = computed(() => [
     'Todos',
-    ...new Set(this.catalog.products().map((p) => p.category)),
+    ...new Set(this.listed().map((p) => p.category)),
   ]);
 
   protected readonly availableCount = computed(
@@ -54,8 +75,7 @@ export class App {
     const q = this.search().trim().toLowerCase();
     const favs = this.catalog.favorites();
     const statusRank = { disponible: 0, reservado: 1, vendido: 2 };
-    const list = this.catalog
-      .products()
+    const list = this.listed()
       .filter((p) => this.category() === 'Todos' || p.category === this.category())
       .filter((p) => !this.hideSold() || p.status !== 'vendido')
       .filter((p) => !this.onlyFavorites() || favs.has(p.id))
@@ -77,7 +97,11 @@ export class App {
       .then((config) => this.auth.init(config))
       // init may rewrite the address (?code=… → #admin) without firing hashchange
       .then(() => this.route.set(routeFromHash()));
-    window.addEventListener('hashchange', () => this.route.set(routeFromHash()));
+    window.addEventListener('hashchange', () => {
+      this.route.set(routeFromHash());
+      this.productId.set(productIdFromHash());
+      if (!productIdFromHash()) this.detailPushed = false;
+    });
 
     // #admin guard: not logged in → #login (and come back after logging in).
     // Logged in but not an admin → the login screen explains it (rendered in the template).
@@ -112,8 +136,26 @@ export class App {
     });
   }
 
+  protected openDetail(p: Product) {
+    this.detailPushed = true;
+    location.hash = `p/${encodeURIComponent(p.id)}`;
+  }
+
+  protected closeDetail() {
+    if (!this.selected()) return;
+    if (this.detailPushed) {
+      history.back(); // the hashchange that follows clears the selection
+    } else {
+      // arrived through a shared link: don't leave the site, just drop the hash
+      history.replaceState(null, '', `${location.pathname}${location.search}`);
+      this.productId.set(null);
+    }
+    this.detailPushed = false;
+  }
+
   protected openContact(items: Product[]) {
-    this.selected.set(null);
+    this.closeDetail();
+    this.catalog.trackInterest(items.map((p) => p.id));
     this.contactItems.set(items);
   }
 }

@@ -117,6 +117,16 @@ export class AuthService {
     return this.refreshing;
   }
 
+  /** "Me interesa" counts per product. The Worker checks with GitHub that this account is an admin. */
+  async interestStats(): Promise<Record<string, number>> {
+    const res = await fetch(`${this.config!.auth!.workerUrl.replace(/\/$/, '')}/stats`, {
+      headers: { Authorization: `Bearer ${await this.token()}` },
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error(`stats ${res.status}`);
+    return (await res.json()).counts ?? {};
+  }
+
   /** The API said the token is no longer valid: end the session so the guard sends the person to login. */
   expire() {
     this.logout();

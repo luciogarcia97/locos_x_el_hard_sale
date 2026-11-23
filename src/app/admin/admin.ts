@@ -49,8 +49,13 @@ export class Admin implements OnDestroy {
   protected readonly processing = signal(false);
   protected newHighlight = '';
 
+  /** "Me interesa" taps per product id (null until loaded / when the counter isn't set up) */
+  protected readonly interest = signal<Record<string, number>>({});
+  protected readonly hasInterest = computed(() => Object.keys(this.interest()).length > 0);
+
   constructor() {
     this.load();
+    this.loadInterest();
   }
 
   ngOnDestroy() {
@@ -120,7 +125,7 @@ export class Admin implements OnDestroy {
   }
 
   protected setStatus(id: string, status: ProductStatus) {
-    this.products.update((list) => list.map((p) => (p.id === id ? { ...p, status } : p)));
+    this.products.update((list) => list.map((p) => (p.id === id ? stampSold({ ...p, status }) : p)));
   }
 
   protected imageUrl(path: string | undefined) {
@@ -172,7 +177,7 @@ export class Admin implements OnDestroy {
     if (!d.category.trim()) return this.draftError.set('Falta la categoría (por ejemplo, Teclados).');
 
     const { originalId, ...rest } = d;
-    const product: Product = {
+    const product: Product = stampSold({
       ...rest,
       name,
       brand: d.brand.trim(),
@@ -180,7 +185,7 @@ export class Admin implements OnDestroy {
       price: Math.round(d.price),
       specs: d.specs.filter((s) => s.label.trim() && s.value.trim()),
       reviewUrl: d.reviewUrl?.trim() ?? '',
-    };
+    });
 
     if (originalId === null) {
       product.id = this.uniqueId(slugify(`${d.brand} ${name}`) || 'producto');
@@ -249,6 +254,18 @@ export class Admin implements OnDestroy {
     if (this.dirty()) e.preventDefault();
   }
 
+  protected interestFor(id: string) {
+    return this.interest()[id] ?? 0;
+  }
+
+  private async loadInterest() {
+    try {
+      this.interest.set(await this.auth.interestStats());
+    } catch {
+      /* counter not set up yet: the column just stays hidden */
+    }
+  }
+
   private uniqueId(base: string) {
     const ids = new Set(this.products().map((p) => p.id));
     let id = base;
@@ -260,4 +277,11 @@ export class Admin implements OnDestroy {
     this.pending().forEach((p) => URL.revokeObjectURL(p.url));
     this.pending.set(new Map());
   }
+}
+
+/** Keeps soldAt in sync with the status, so the site can hide sold items after a while. */
+function stampSold(p: Product): Product {
+  if (p.status === 'vendido') return p.soldAt ? p : { ...p, soldAt: new Date().toISOString().slice(0, 10) };
+  const { soldAt: _, ...rest } = p;
+  return rest;
 }

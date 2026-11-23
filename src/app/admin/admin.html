@@ -205,7 +205,12 @@
                   <strong>{{ p.name }}</strong>
                   <span class="muted">{{ p.brand }}, {{ p.category }}</span>
                 </div>
-                <span class="adm-price">{{ formatPrice(p.price) }}</span>
+                <span class="adm-price">
+                  {{ formatPrice(p.price) }}
+                  @if (hasInterest()) {
+                    <small class="adm-interest" [title]="'Veces que tocaron Me interesa'">{{ interestFor(p.id) }} interesados</small>
+                  }
+                </span>
                 <select class="adm-status status-{{ p.status }}" (change)="setStatus(p.id, $any($event.target).value)" [attr.aria-label]="'Estado de ' + p.name">
                   @for (s of statuses; track s) {
                     <option [value]="s" [selected]="s === p.status">{{ statusLabel[s] }}</option>

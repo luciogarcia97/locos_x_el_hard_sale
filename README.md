@@ -69,6 +69,27 @@ Después de crearla:
 
 Commit + push y listo. El Client ID y la URL del Worker son públicos a propósito; el único secreto está en Cloudflare.
 
+### Contador de "Me interesa" (opcional)
+
+El panel muestra cuántas veces tocaron **Me interesa** en cada producto. Es anónimo: solo se envía el id del
+producto, una vez por producto, por navegador y por día. Lo guarda el mismo Worker en Cloudflare KV (gratis):
+
+1. Cloudflare → *Storage & Databases → KV* → *Create* → nombre `garage-sale-interest`.
+2. En el Worker → *Settings → Bindings → Add → KV namespace* → Variable name `INTEREST`, elegir ese namespace.
+3. En el Worker → *Settings → Variables and Secrets* → agregar `GITHUB_REPO` (Text) = `luciogarcia97/locos_x_el_hard_sale`.
+4. *Edit code* → pegar el `worker/index.js` actualizado → *Deploy*.
+
+Los totales solo los puede ver un admin: el Worker le pregunta a GitHub si esa cuenta puede escribir en el repo.
+Si el contador no está configurado, la web funciona igual y el panel simplemente no muestra la columna.
+
+### Otros detalles
+
+- **Link por producto**: cada producto tiene su dirección (`…/#p/<id>`) y un botón *Compartir*. Si se abre
+  desde la web, el botón *atrás* del celular cierra el detalle.
+- **Vendidos**: al marcar un producto como vendido, el panel guarda la fecha (`soldAt`) y la web lo oculta a los
+  15 días. Se cambia con `hideSoldAfterDays` en `config.json`.
+- **Vista previa al compartir** (WhatsApp, redes): `public/images/og.jpg`, 1200×630.
+
 ## Cómo editar los productos (sin tocar código)
 
 Todo vive en dos archivos JSON:
