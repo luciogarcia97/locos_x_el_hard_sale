@@ -9,11 +9,24 @@
     "price": 80000,
     "status": "vendido",
     "images": [],
-    "highlights": ["Switches magnéticos", "Formato 75%", "Cableado"],
+    "highlights": [
+      "Switches magnéticos",
+      "Formato 75%",
+      "Cableado"
+    ],
     "specs": [
-      { "label": "Formato", "value": "75%" },
-      { "label": "Switches", "value": "Magnéticos (Hall Effect)" },
-      { "label": "Conexión", "value": "Cableado USB-C" }
+      {
+        "label": "Formato",
+        "value": "75%"
+      },
+      {
+        "label": "Switches",
+        "value": "Magnéticos (Hall Effect)"
+      },
+      {
+        "label": "Conexión",
+        "value": "Cableado USB-C"
+      }
     ],
     "description": "Teclado magnético con actuación ajustable. Se usó solamente para la review.",
     "reviewUrl": ""
@@ -28,11 +41,24 @@
     "price": 130000,
     "status": "disponible",
     "images": [],
-    "highlights": ["Inalámbrico", "Formato 96%", "RGB"],
+    "highlights": [
+      "Inalámbrico",
+      "Formato 96%",
+      "RGB"
+    ],
     "specs": [
-      { "label": "Formato", "value": "96% (con numérico)" },
-      { "label": "Conexión", "value": "2.4 GHz / Bluetooth / USB-C" },
-      { "label": "Iluminación", "value": "RGB" }
+      {
+        "label": "Formato",
+        "value": "96% (con numérico)"
+      },
+      {
+        "label": "Conexión",
+        "value": "2.4 GHz / Bluetooth / USB-C"
+      },
+      {
+        "label": "Iluminación",
+        "value": "RGB"
+      }
     ],
     "description": "Teclado completo con numérico en formato compacto. Incluye caja y accesorios originales.",
     "reviewUrl": ""
@@ -47,10 +73,19 @@
     "price": 68000,
     "status": "disponible",
     "images": [],
-    "highlights": ["TKL", "Colorway rosa/gris"],
+    "highlights": [
+      "TKL",
+      "Colorway rosa/gris"
+    ],
     "specs": [
-      { "label": "Formato", "value": "TKL (87 teclas)" },
-      { "label": "Color", "value": "Rosa / Gris" }
+      {
+        "label": "Formato",
+        "value": "TKL (87 teclas)"
+      },
+      {
+        "label": "Color",
+        "value": "Rosa / Gris"
+      }
     ],
     "description": "TKL con una combinación de colores que llama la atención. Usado solo para la review.",
     "reviewUrl": ""
@@ -65,9 +100,14 @@
     "price": 140000,
     "status": "disponible",
     "images": [],
-    "highlights": ["Gama alta Redragon"],
+    "highlights": [
+      "Gama alta Redragon"
+    ],
     "specs": [
-      { "label": "Modelo", "value": "K737 Uranus Pro" }
+      {
+        "label": "Modelo",
+        "value": "K737 Uranus Pro"
+      }
     ],
     "description": "Completo con caja y accesorios.",
     "reviewUrl": ""
@@ -82,10 +122,19 @@
     "price": 60000,
     "status": "disponible",
     "images": [],
-    "highlights": ["Switches magnéticos", "TKL"],
+    "highlights": [
+      "Switches magnéticos",
+      "TKL"
+    ],
     "specs": [
-      { "label": "Formato", "value": "TKL" },
-      { "label": "Switches", "value": "Magnéticos" }
+      {
+        "label": "Formato",
+        "value": "TKL"
+      },
+      {
+        "label": "Switches",
+        "value": "Magnéticos"
+      }
     ],
     "description": "La versión magnética del clásico Kumara. Una entrada barata al mundo de los switches magnéticos.",
     "reviewUrl": ""
@@ -100,12 +149,29 @@
     "price": 240000,
     "status": "disponible",
     "images": [],
-    "highlights": ["Inalámbrico", "Formato 75%", "Pantalla OLED", "Blanco"],
+    "highlights": [
+      "Inalámbrico",
+      "Formato 75%",
+      "Pantalla OLED",
+      "Blanco"
+    ],
     "specs": [
-      { "label": "Formato", "value": "75%" },
-      { "label": "Switches", "value": "ROG NX / MX Storm" },
-      { "label": "Conexión", "value": "2.4 GHz / Bluetooth / USB-C" },
-      { "label": "Extras", "value": "Pantalla OLED, perilla multifunción" }
+      {
+        "label": "Formato",
+        "value": "75%"
+      },
+      {
+        "label": "Switches",
+        "value": "ROG NX / MX Storm"
+      },
+      {
+        "label": "Conexión",
+        "value": "2.4 GHz / Bluetooth / USB-C"
+      },
+      {
+        "label": "Extras",
+        "value": "Pantalla OLED, perilla multifunción"
+      }
     ],
     "description": "Teclado premium de ROG en versión blanca. Usado, en excelente estado.",
     "reviewUrl": ""
@@ -120,9 +186,14 @@
     "price": 50000,
     "status": "vendido",
     "images": [],
-    "highlights": ["Color negro"],
+    "highlights": [
+      "Color negro"
+    ],
     "specs": [
-      { "label": "Color", "value": "Negro" }
+      {
+        "label": "Color",
+        "value": "Negro"
+      }
     ],
     "description": "Completos con caja.",
     "reviewUrl": ""
@@ -137,12 +208,21 @@
     "price": 75000,
     "status": "disponible",
     "images": [],
-    "highlights": ["Edición especial Shinden", "Negro / Violeta"],
+    "highlights": [
+      "Edición especial Shinden",
+      "Negro / Violeta"
+    ],
     "specs": [
-      { "label": "Edición", "value": "Shinden" },
-      { "label": "Color", "value": "Negro / Violeta" }
+      {
+        "label": "Edición",
+        "value": "Shinden"
+      },
+      {
+        "label": "Color",
+        "value": "Negro / Violeta"
+      }
     ],
     "description": "Edición especial con diseño Shinden.",
-    "reviewUrl": ""
+    "reviewUrl": "https://youtu.be/eN30f7fYW7g?t=336"
   }
 ]
