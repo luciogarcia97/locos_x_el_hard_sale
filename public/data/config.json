@@ -1,0 +1,16 @@
+{
+  "title": "Garage Sale",
+  "subtitle": "Productos de review y usados, revisados y probados por Locos por el Hardware.",
+  "instagram": "locosporelhardware",
+  "tiktok": "locosporelhardware",
+  "facebook": "locosporelhardoficial",
+  "whatsapp": "",
+  "zone": "Capital Federal · Villa Luro / Villa Crespo",
+  "shipping": "Envíos a convenir",
+  "messageTemplate": "¡Hola Locos! Vi la Garage Sale y me interesa:",
+  "github": {
+    "owner": "luciogarcia97",
+    "repo": "locos_x_el_hard_sale",
+    "branch": "main"
+  }
+}

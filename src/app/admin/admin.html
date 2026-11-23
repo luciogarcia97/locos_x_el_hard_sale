@@ -1,0 +1,259 @@
+<div class="adm">
+  <header class="adm-bar">
+    <div class="container adm-bar-inner">
+      <a class="adm-home" href="./" title="Volver a la web">
+        <img src="images/logo.webp" alt="" width="36" height="36" />
+        <span>Panel de la Garage Sale</span>
+      </a>
+      @if (gh.settings(); as s) {
+        <div class="adm-bar-actions">
+          @if (dirty()) {
+            <span class="adm-dirty">Cambios sin publicar</span>
+          }
+          <button class="btn btn-primary btn-sm" type="button" [disabled]="!dirty() || publishing() || !!draft()" (click)="publish()">
+            {{ publishing() ? 'Publicando…' : 'Publicar cambios' }}
+          </button>
+          <button class="btn btn-ghost btn-sm" type="button" (click)="disconnect()">Desconectar</button>
+        </div>
+      }
+    </div>
+  </header>
+
+  <main class="container adm-main">
+    @if (error()) {
+      <p class="adm-msg adm-msg-error" role="alert">{{ error() }}</p>
+    }
+    @if (notice()) {
+      <p class="adm-msg adm-msg-ok" role="status">{{ notice() }}</p>
+    }
+
+    @if (!gh.settings()) {
+      <!-- ============ connect ============ -->
+      <section class="adm-connect">
+        <div>
+          <h1>Conectá el panel con GitHub</h1>
+          <p class="adm-lead">
+            Los productos se guardan en el repositorio de la web. Para editarlos desde acá necesitás una clave de
+            acceso de GitHub que solo pueda tocar ese repositorio. Se crea una sola vez y queda guardada en este navegador.
+          </p>
+          <ol class="adm-howto">
+            <li>Entrá a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
+            <li>Ponele un nombre (por ejemplo, "Panel Garage Sale") y elegí cuándo vence.</li>
+            <li>En <em>Repository access</em> elegí <em>Only select repositories</em> y marcá el repositorio de la web.</li>
+            <li>En <em>Permissions → Repository permissions</em> buscá <em>Contents</em> y elegí <em>Read and write</em>.</li>
+            <li>Tocá <em>Generate token</em>, copiá la clave y pegala acá.</li>
+          </ol>
+        </div>
+
+        <form class="adm-card adm-form" (ngSubmit)="connect()">
+          <label>
+            Usuario u organización de GitHub
+            <input name="owner" [(ngModel)]="form.owner" required autocomplete="off" placeholder="locosporelhardware" />
+          </label>
+          <label>
+            Repositorio
+            <input name="repo" [(ngModel)]="form.repo" required autocomplete="off" placeholder="garage-sale" />
+          </label>
+          <label>
+            Rama
+            <input name="branch" [(ngModel)]="form.branch" autocomplete="off" />
+          </label>
+          <label>
+            Clave de acceso
+            <input name="token" type="password" [(ngModel)]="form.token" required autocomplete="off" placeholder="github_pat_…" />
+          </label>
+          <button class="btn btn-primary" type="submit" [disabled]="connecting() || !form.owner || !form.repo || !form.token">
+            {{ connecting() ? 'Conectando…' : 'Conectar' }}
+          </button>
+          <p class="muted">Usá este panel solo en una computadora tuya: la clave queda guardada en el navegador.</p>
+        </form>
+      </section>
+    } @else if (draft(); as d) {
+      <!-- ============ editor ============ -->
+      <section class="adm-editor">
+        <div class="adm-head">
+          <h1>{{ d.originalId ? 'Editar producto' : 'Nuevo producto' }}</h1>
+          <button class="btn btn-ghost btn-sm" type="button" (click)="cancelDraft()">Volver a la lista</button>
+        </div>
+
+        <form class="adm-grid" (ngSubmit)="saveDraft()">
+          <div class="adm-card adm-form">
+            <h2>Datos</h2>
+            <label class="span-2">
+              Nombre
+              <input name="name" [(ngModel)]="d.name" required placeholder="Teclado Royal Kludge RK R99 Halo Inalámbrico" />
+            </label>
+            <label>
+              Marca
+              <input name="brand" [(ngModel)]="d.brand" placeholder="Royal Kludge" />
+            </label>
+            <label>
+              Categoría
+              <input name="category" [(ngModel)]="d.category" list="adm-categories" required placeholder="Teclados" />
+              <datalist id="adm-categories">
+                @for (c of categories(); track c) {
+                  <option [value]="c"></option>
+                }
+              </datalist>
+            </label>
+            <label>
+              Precio (ARS)
+              <input name="price" type="number" min="0" step="1000" [(ngModel)]="d.price" required />
+            </label>
+            <label>
+              Estado
+              <select name="status" [(ngModel)]="d.status">
+                @for (s of statuses; track s) {
+                  <option [value]="s">{{ statusLabel[s] }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              Origen
+              <select name="origin" [(ngModel)]="d.origin">
+                @for (o of origins; track o) {
+                  <option [value]="o">{{ o }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              Condición
+              <input name="condition" [(ngModel)]="d.condition" placeholder="Completo, como nuevo" />
+            </label>
+            <label class="span-2">
+              Descripción
+              <textarea name="description" rows="4" [(ngModel)]="d.description" placeholder="Qué incluye, cuánto se usó, detalles a tener en cuenta."></textarea>
+            </label>
+            <label class="span-2">
+              Link a la review (opcional)
+              <input name="reviewUrl" type="url" [(ngModel)]="d.reviewUrl" placeholder="https://youtube.com/watch?v=…" />
+            </label>
+          </div>
+
+          <div class="adm-side">
+            <div class="adm-card">
+              <h2>Fotos</h2>
+              <p class="muted">La primera es la que se ve en la tarjeta. Se achican y convierten a WebP solas.</p>
+              @if (d.images.length) {
+                <ul class="adm-photos">
+                  @for (img of d.images; track img; let i = $index, first = $first, last = $last) {
+                    <li [class.cover]="first">
+                      <img [src]="imageUrl(img)" alt="" />
+                      @if (first) {
+                        <span class="adm-cover">Portada</span>
+                      }
+                      <div class="adm-photo-actions">
+                        <button type="button" [disabled]="first" (click)="moveAt(d.images, i, -1)" aria-label="Mover antes">‹</button>
+                        <button type="button" (click)="removeAt(d.images, i)" aria-label="Quitar foto">✕</button>
+                        <button type="button" [disabled]="last" (click)="moveAt(d.images, i, 1)" aria-label="Mover después">›</button>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+              <label class="btn btn-ghost adm-upload" [class.busy]="processing()">
+                {{ processing() ? 'Procesando fotos…' : 'Agregar fotos' }}
+                <input type="file" accept="image/*" multiple (change)="addPhotos($any($event.target))" [disabled]="processing()" />
+              </label>
+            </div>
+
+            <div class="adm-card">
+              <h2>Destacados</h2>
+              <p class="muted">Aparecen como etiquetas en la tarjeta. Mejor 2 o 3.</p>
+              @if (d.highlights.length) {
+                <ul class="adm-chips">
+                  @for (h of d.highlights; track h; let i = $index) {
+                    <li>{{ h }} <button type="button" (click)="removeAt(d.highlights, i)" [attr.aria-label]="'Quitar ' + h">✕</button></li>
+                  }
+                </ul>
+              }
+              <div class="adm-inline">
+                <input name="newHighlight" [(ngModel)]="newHighlight" placeholder="Inalámbrico" (keydown.enter)="$event.preventDefault(); addHighlight()" />
+                <button class="btn btn-ghost btn-sm" type="button" (click)="addHighlight()">Agregar</button>
+              </div>
+            </div>
+
+            <div class="adm-card">
+              <h2>Características</h2>
+              @for (s of d.specs; track $index; let i = $index) {
+                <div class="adm-spec">
+                  <input [name]="'spec-l-' + i" [(ngModel)]="s.label" placeholder="Conexión" aria-label="Característica" />
+                  <input [name]="'spec-v-' + i" [(ngModel)]="s.value" placeholder="2.4 GHz / Bluetooth" aria-label="Valor" />
+                  <button type="button" (click)="removeAt(d.specs, i)" aria-label="Quitar característica">✕</button>
+                </div>
+              }
+              <button class="btn btn-ghost btn-sm" type="button" (click)="addSpec()">Agregar característica</button>
+            </div>
+          </div>
+
+          <div class="adm-editor-foot">
+            @if (draftError()) {
+              <p class="adm-msg adm-msg-error" role="alert">{{ draftError() }}</p>
+            }
+            <div class="adm-editor-actions">
+              @if (d.originalId) {
+                <button class="btn btn-danger" type="button" (click)="deleteDraft()">Eliminar producto</button>
+              }
+              <span class="adm-spacer"></span>
+              <button class="btn btn-ghost" type="button" (click)="cancelDraft()">Cancelar</button>
+              <button class="btn btn-primary" type="submit" [disabled]="processing()">
+                {{ d.originalId ? 'Guardar cambios' : 'Agregar al catálogo' }}
+              </button>
+            </div>
+            <p class="muted">Lo que guardes acá queda en la lista. Se sube a la web cuando tocás "Publicar cambios".</p>
+          </div>
+        </form>
+      </section>
+    } @else {
+      <!-- ============ list ============ -->
+      <section>
+        <div class="adm-head">
+          <h1>Productos <span class="adm-count">{{ products().length }}</span></h1>
+          <div class="adm-head-actions">
+            <button class="btn btn-ghost btn-sm" type="button" (click)="load()" [disabled]="loading()">Recargar</button>
+            <button class="btn btn-primary btn-sm" type="button" (click)="create()">Nuevo producto</button>
+          </div>
+        </div>
+        <p class="muted adm-hint">El orden de esta lista es el orden en que aparecen en la web.</p>
+
+        @if (loading()) {
+          <p class="state">Cargando productos desde GitHub…</p>
+        } @else if (!products().length) {
+          <div class="adm-empty">
+            <p>Todavía no hay productos.</p>
+            <button class="btn btn-primary" type="button" (click)="create()">Agregar el primero</button>
+          </div>
+        } @else {
+          <ul class="adm-list">
+            @for (p of products(); track p.id; let i = $index, first = $first, last = $last) {
+              <li class="adm-row" [class.sold]="p.status === 'vendido'">
+                <div class="adm-order">
+                  <button type="button" [disabled]="first" (click)="move(i, -1)" [attr.aria-label]="'Subir ' + p.name">▲</button>
+                  <button type="button" [disabled]="last" (click)="move(i, 1)" [attr.aria-label]="'Bajar ' + p.name">▼</button>
+                </div>
+                <div class="adm-thumb">
+                  @if (p.images[0]) {
+                    <img [src]="imageUrl(p.images[0])" alt="" loading="lazy" />
+                  } @else {
+                    <span>Sin fotos</span>
+                  }
+                </div>
+                <div class="adm-row-info">
+                  <strong>{{ p.name }}</strong>
+                  <span class="muted">{{ p.brand }}, {{ p.category }}</span>
+                </div>
+                <span class="adm-price">{{ formatPrice(p.price) }}</span>
+                <select class="adm-status status-{{ p.status }}" (change)="setStatus(p.id, $any($event.target).value)" [attr.aria-label]="'Estado de ' + p.name">
+                  @for (s of statuses; track s) {
+                    <option [value]="s" [selected]="s === p.status">{{ statusLabel[s] }}</option>
+                  }
+                </select>
+                <button class="btn btn-ghost btn-sm" type="button" (click)="edit(p)">Editar</button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  </main>
+</div>
