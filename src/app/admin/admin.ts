@@ -1,8 +1,8 @@
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CatalogService } from '../catalog.service';
 import { Product, ProductStatus, formatPrice } from '../models';
-import { GithubService, IMAGES_DIR, PendingFile, RepoSettings, compressImage, slugify } from './github.service';
+import { AuthService } from '../auth.service';
+import { GithubService, IMAGES_DIR, PendingFile, compressImage, slugify } from './github.service';
 
 interface Draft extends Product {
   /** id of the product being edited, or null when creating one */
@@ -20,21 +20,12 @@ const STATUSES: ProductStatus[] = ['disponible', 'reservado', 'vendido'];
 })
 export class Admin implements OnDestroy {
   protected readonly gh = inject(GithubService);
-  private readonly catalog = inject(CatalogService);
+  protected readonly auth = inject(AuthService);
 
   protected readonly origins = ORIGINS;
   protected readonly statuses = STATUSES;
   protected readonly statusLabel: Record<ProductStatus, string> = { disponible: 'Disponible', reservado: 'Reservado', vendido: 'Vendido' };
   protected readonly formatPrice = formatPrice;
-
-  // ---- connection ----
-  protected readonly form: RepoSettings = {
-    owner: this.gh.settings()?.owner ?? this.catalog.config()?.github?.owner ?? '',
-    repo: this.gh.settings()?.repo ?? this.catalog.config()?.github?.repo ?? '',
-    branch: this.gh.settings()?.branch ?? this.catalog.config()?.github?.branch ?? 'main',
-    token: '',
-  };
-  protected readonly connecting = signal(false);
 
   // ---- catalog being edited ----
   protected readonly products = signal<Product[]>([]);
@@ -59,32 +50,18 @@ export class Admin implements OnDestroy {
   protected newHighlight = '';
 
   constructor() {
-    if (this.gh.settings()) this.load();
+    this.load();
   }
 
   ngOnDestroy() {
     this.pending().forEach((p) => URL.revokeObjectURL(p.url));
   }
 
-  protected async connect() {
-    this.error.set(null);
-    this.connecting.set(true);
-    try {
-      await this.gh.connect(this.form);
-      this.form.token = '';
-      await this.load();
-    } catch (e) {
-      this.error.set((e as Error).message);
-    } finally {
-      this.connecting.set(false);
-    }
-  }
-
-  protected disconnect() {
-    if (this.dirty() && !confirm('Tenés cambios sin publicar. Si desconectás se pierden. ¿Desconectar igual?')) return;
-    this.gh.disconnect();
-    this.products.set([]);
-    this.draft.set(null);
+  protected logout() {
+    if (this.dirty() && !confirm('Tenés cambios sin publicar. Si salís se pierden. ¿Salir igual?')) return;
+    this.published.set(JSON.stringify(this.products())); // don't trigger the unload warning
+    location.hash = '';
+    this.auth.logout();
   }
 
   protected async load() {

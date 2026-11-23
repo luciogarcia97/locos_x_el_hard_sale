@@ -1,5 +1,7 @@
 import { Component, DOCUMENT, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { Admin } from './admin/admin';
+import { AuthService } from './auth.service';
+import { Login } from './login';
 import { CatalogService } from './catalog.service';
 import { ContactDialog } from './contact-dialog';
 import { Product } from './models';
@@ -7,14 +9,24 @@ import { ProductCard } from './product-card';
 import { ProductDetail } from './product-detail';
 
 type Sort = 'destacados' | 'precio-asc' | 'precio-desc';
+/** Hash routes, so the site works on any static host without server rewrites. */
+type Route = 'home' | 'admin' | 'login';
+
+const routeFromHash = (): Route => {
+  if (location.hash === '#admin') return 'admin';
+  // coming back from GitHub (?code=…): show the login screen while the session is created
+  if (location.hash === '#login' || new URLSearchParams(location.search).has('code')) return 'login';
+  return 'home';
+};
 
 @Component({
   selector: 'app-root',
-  imports: [ProductCard, ProductDetail, ContactDialog, Admin],
+  imports: [ProductCard, ProductDetail, ContactDialog, Admin, Login],
   templateUrl: './app.html',
 })
 export class App {
   protected readonly catalog = inject(CatalogService);
+  protected readonly auth = inject(AuthService);
 
   protected readonly category = signal<string>('Todos');
   protected readonly hideSold = signal(false);
@@ -22,8 +34,7 @@ export class App {
   protected readonly search = signal('');
   protected readonly sort = signal<Sort>('destacados');
 
-  /** The admin panel lives at #admin, so it works on any static host without server routing. */
-  protected readonly isAdmin = signal(location.hash === '#admin');
+  protected readonly route = signal<Route>(routeFromHash());
 
   private readonly hero = viewChild<ElementRef<HTMLElement>>('hero');
 
@@ -61,8 +72,29 @@ export class App {
   });
 
   constructor() {
-    this.catalog.load();
-    window.addEventListener('hashchange', () => this.isAdmin.set(location.hash === '#admin'));
+    this.catalog
+      .load()
+      .then((config) => this.auth.init(config))
+      // init may rewrite the address (?code=… → #admin) without firing hashchange
+      .then(() => this.route.set(routeFromHash()));
+    window.addEventListener('hashchange', () => this.route.set(routeFromHash()));
+
+    // #admin guard: not logged in → #login (and come back after logging in).
+    // Logged in but not an admin → the login screen explains it (rendered in the template).
+    effect(() => {
+      this.route(); // re-run on navigation…
+      // …but read the live address: logout changes the hash right before ending the session,
+      // and the hashchange event (which updates the signal) arrives later
+      const route = routeFromHash();
+      const status = this.auth.status();
+      if (route === 'admin' && (status === 'anon' || status === 'unconfigured')) {
+        this.auth.returnTo = 'admin';
+        location.replace('#login');
+      } else if (route === 'login' && status === 'admin' && this.auth.returnTo === 'admin') {
+        this.auth.returnTo = null;
+        location.replace('#admin');
+      }
+    });
 
     // freeze the page behind any open modal
     const doc = inject(DOCUMENT);

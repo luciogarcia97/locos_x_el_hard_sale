@@ -5,7 +5,7 @@
         <img src="images/logo.webp" alt="" width="36" height="36" />
         <span>Panel de la Garage Sale</span>
       </a>
-      @if (gh.settings(); as s) {
+      @if (auth.user(); as u) {
         <div class="adm-bar-actions">
           @if (dirty()) {
             <span class="adm-dirty">Cambios sin publicar</span>
@@ -13,7 +13,11 @@
           <button class="btn btn-primary btn-sm" type="button" [disabled]="!dirty() || publishing() || !!draft()" (click)="publish()">
             {{ publishing() ? 'Publicando…' : 'Publicar cambios' }}
           </button>
-          <button class="btn btn-ghost btn-sm" type="button" (click)="disconnect()">Desconectar</button>
+          <span class="adm-user" [title]="'Ingresaste como @' + u.login">
+            <img [src]="u.avatarUrl + '&s=56'" alt="" width="28" height="28" />
+            <span>{{ u.login }}</span>
+          </span>
+          <button class="btn btn-ghost btn-sm" type="button" (click)="logout()">Salir</button>
         </div>
       }
     </div>
@@ -27,48 +31,7 @@
       <p class="adm-msg adm-msg-ok" role="status">{{ notice() }}</p>
     }
 
-    @if (!gh.settings()) {
-      <!-- ============ connect ============ -->
-      <section class="adm-connect">
-        <div>
-          <h1>Conectá el panel con GitHub</h1>
-          <p class="adm-lead">
-            Los productos se guardan en el repositorio de la web. Para editarlos desde acá necesitás una clave de
-            acceso de GitHub que solo pueda tocar ese repositorio. Se crea una sola vez y queda guardada en este navegador.
-          </p>
-          <ol class="adm-howto">
-            <li>Entrá a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
-            <li>Ponele un nombre (por ejemplo, "Panel Garage Sale") y elegí cuándo vence.</li>
-            <li>En <em>Repository access</em> elegí <em>Only select repositories</em> y marcá el repositorio de la web.</li>
-            <li>En <em>Permissions → Repository permissions</em> buscá <em>Contents</em> y elegí <em>Read and write</em>.</li>
-            <li>Tocá <em>Generate token</em>, copiá la clave y pegala acá.</li>
-          </ol>
-        </div>
-
-        <form class="adm-card adm-form" (ngSubmit)="connect()">
-          <label>
-            Usuario u organización de GitHub
-            <input name="owner" [(ngModel)]="form.owner" required autocomplete="off" placeholder="locosporelhardware" />
-          </label>
-          <label>
-            Repositorio
-            <input name="repo" [(ngModel)]="form.repo" required autocomplete="off" placeholder="garage-sale" />
-          </label>
-          <label>
-            Rama
-            <input name="branch" [(ngModel)]="form.branch" autocomplete="off" />
-          </label>
-          <label>
-            Clave de acceso
-            <input name="token" type="password" [(ngModel)]="form.token" required autocomplete="off" placeholder="github_pat_…" />
-          </label>
-          <button class="btn btn-primary" type="submit" [disabled]="connecting() || !form.owner || !form.repo || !form.token">
-            {{ connecting() ? 'Conectando…' : 'Conectar' }}
-          </button>
-          <p class="muted">Usá este panel solo en una computadora tuya: la clave queda guardada en el navegador.</p>
-        </form>
-      </section>
-    } @else if (draft(); as d) {
+    @if (draft(); as d) {
       <!-- ============ editor ============ -->
       <section class="adm-editor">
         <div class="adm-head">

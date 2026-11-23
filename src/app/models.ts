@@ -35,8 +35,10 @@ export interface SiteConfig {
   zone: string;
   shipping: string;
   messageTemplate: string;
-  /** Repo the admin panel (#admin) edits. Pre-fills the connect form. */
+  /** Repo the admin panel (#admin) edits. */
   github?: { owner: string; repo: string; branch: string };
+  /** "Ingresar con GitHub": the GitHub App's Client ID and the Cloudflare Worker URL (see worker/). */
+  auth?: { clientId: string; workerUrl: string };
 }
 
 export const formatPrice = (value: number) =>

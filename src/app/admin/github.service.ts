@@ -1,12 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { AuthService, SessionExpired } from '../auth.service';
 import { Product } from '../models';
-
-export interface RepoSettings {
-  owner: string;
-  repo: string;
-  branch: string;
-  token: string;
-}
 
 /** A new file to add to the repo, already encoded as base64. */
 export interface PendingFile {
@@ -14,60 +8,34 @@ export interface PendingFile {
   base64: string;
 }
 
-const SETTINGS_KEY = 'loh-admin-repo';
 export const PRODUCTS_PATH = 'public/data/products.json';
 export const IMAGES_DIR = 'images/products';
 
 /**
- * Talks to the GitHub REST API from the browser.
+ * Talks to the GitHub REST API from the browser with the logged-in admin's token.
  * Reads the catalog straight from the repo (always the latest version, not the
  * deployed copy) and publishes every change as a single commit, which triggers
  * the GitHub Pages deploy workflow.
  */
 @Injectable({ providedIn: 'root' })
 export class GithubService {
-  readonly settings = signal<RepoSettings | null>(this.readSettings());
+  private readonly auth = inject(AuthService);
 
   /** sha of products.json when it was loaded; used to detect edits made elsewhere. */
   private loadedSha: string | null = null;
 
-  async connect(s: RepoSettings) {
-    const settings = { ...s, owner: s.owner.trim(), repo: s.repo.trim(), branch: s.branch.trim() || 'main', token: s.token.trim() };
-    const repo = await this.api<{ permissions?: { push?: boolean } }>(`/repos/${settings.owner}/${settings.repo}`, {}, settings);
-    if (repo.permissions && !repo.permissions.push) {
-      throw new Error('La clave no tiene permiso de escritura en este repositorio. Revisá que tenga "Contents: Read and write".');
-    }
-    this.settings.set(settings);
-    try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    } catch {
-      /* storage blocked: the session works until the tab closes */
-    }
-  }
-
-  disconnect() {
-    this.settings.set(null);
-    try {
-      localStorage.removeItem(SETTINGS_KEY);
-    } catch {
-      /* nothing to clean */
-    }
-  }
-
   async loadProducts(): Promise<Product[]> {
-    const s = this.require();
-    const file = await this.api<{ sha: string; content: string }>(
-      `/repos/${s.owner}/${s.repo}/contents/${PRODUCTS_PATH}?ref=${encodeURIComponent(s.branch)}`,
-    );
+    const { base, branch } = this.target();
+    const file = await this.api<{ sha: string; content: string }>(`${base}/contents/${PRODUCTS_PATH}?ref=${encodeURIComponent(branch)}`);
     this.loadedSha = file.sha;
     return JSON.parse(decodeBase64(file.content));
   }
 
   /** Public URL of a file already in the repo (works before the site redeploys). */
   rawUrl(publicPath: string) {
-    const s = this.settings();
-    if (!s) return publicPath;
-    return `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/public/${publicPath}`;
+    const r = this.auth.repo;
+    if (!r) return publicPath;
+    return `https://raw.githubusercontent.com/${r.owner}/${r.repo}/${r.branch}/public/${publicPath}`;
   }
 
   /**
@@ -75,15 +43,14 @@ export class GithubService {
    * no product uses any more.
    */
   async publish(products: Product[], added: PendingFile[], removed: string[], message: string) {
-    const s = this.require();
-    const base = `/repos/${s.owner}/${s.repo}`;
+    const { base, branch } = this.target();
 
-    const current = await this.api<{ sha: string }>(`${base}/contents/${PRODUCTS_PATH}?ref=${encodeURIComponent(s.branch)}`);
+    const current = await this.api<{ sha: string }>(`${base}/contents/${PRODUCTS_PATH}?ref=${encodeURIComponent(branch)}`);
     if (this.loadedSha && current.sha !== this.loadedSha) {
       throw new Error('El catálogo se modificó desde otro lado mientras editabas. Recargá el panel para traer la última versión y volvé a hacer los cambios.');
     }
 
-    const ref = await this.api<{ object: { sha: string } }>(`${base}/git/ref/heads/${s.branch}`);
+    const ref = await this.api<{ object: { sha: string } }>(`${base}/git/ref/heads/${branch}`);
     const headSha = ref.object.sha;
     const head = await this.api<{ tree: { sha: string } }>(`${base}/git/commits/${headSha}`);
 
@@ -114,7 +81,7 @@ export class GithubService {
       body: JSON.stringify({ message, tree: tree.sha, parents: [headSha] }),
     });
 
-    await this.api(`${base}/git/refs/heads/${s.branch}`, {
+    await this.api(`${base}/git/refs/heads/${branch}`, {
       method: 'PATCH',
       body: JSON.stringify({ sha: commit.sha }),
     });
@@ -124,13 +91,21 @@ export class GithubService {
     this.loadedSha = fresh.sha;
   }
 
-  private require(): RepoSettings {
-    const s = this.settings();
-    if (!s) throw new Error('Primero conectá el panel con GitHub.');
-    return s;
+  private target() {
+    const r = this.auth.repo;
+    if (!r) throw new Error('Falta configurar el repositorio en config.json (github.owner / github.repo).');
+    return { base: `/repos/${r.owner}/${r.repo}`, branch: r.branch };
   }
 
-  private async api<T = unknown>(path: string, init: RequestInit = {}, settings = this.settings()): Promise<T> {
+  private async api<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
+    let token: string;
+    try {
+      token = await this.auth.token();
+    } catch {
+      this.auth.expire();
+      throw new SessionExpired();
+    }
+
     let res: Response;
     try {
       res = await fetch(`https://api.github.com${path}`, {
@@ -139,7 +114,7 @@ export class GithubService {
         headers: {
           Accept: 'application/vnd.github+json',
           'X-GitHub-Api-Version': '2022-11-28',
-          ...(settings?.token ? { Authorization: `Bearer ${settings.token}` } : {}),
+          Authorization: `Bearer ${token}`,
           ...(init.body ? { 'Content-Type': 'application/json' } : {}),
         },
       });
@@ -148,19 +123,16 @@ export class GithubService {
     }
     if (res.ok) return (res.status === 204 ? null : await res.json()) as T;
 
-    if (res.status === 401) throw new Error('La clave de acceso no es válida o venció. Generá una nueva y volvé a conectar.');
-    if (res.status === 403) throw new Error('GitHub rechazó la operación: la clave no tiene permiso de escritura (Contents: Read and write) en este repositorio.');
-    if (res.status === 404) throw new Error('No se encontró el repositorio, la rama o el archivo de productos. Revisá usuario, repositorio y rama.');
+    if (res.status === 401) {
+      this.auth.expire();
+      throw new SessionExpired();
+    }
+    if (res.status === 403) {
+      throw new Error('GitHub rechazó el cambio. Revisá que tu cuenta sea colaboradora del repositorio y que la GitHub App esté instalada en él.');
+    }
+    if (res.status === 404) throw new Error('No se encontró el repositorio, la rama o el archivo de productos. Revisá github.owner / github.repo / github.branch en config.json.');
     if (res.status === 409 || res.status === 422) throw new Error('GitHub no aceptó el cambio porque el repositorio se actualizó. Recargá el panel y probá de nuevo.');
     throw new Error(`GitHub respondió con un error (${res.status}). Probá de nuevo en un rato.`);
-  }
-
-  private readSettings(): RepoSettings | null {
-    try {
-      return JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null');
-    } catch {
-      return null;
-    }
   }
 }
 

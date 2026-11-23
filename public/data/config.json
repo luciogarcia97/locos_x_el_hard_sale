@@ -12,5 +12,9 @@
     "owner": "luciogarcia97",
     "repo": "locos_x_el_hard_sale",
     "branch": "main"
+  },
+  "auth": {
+    "clientId": "Iv23liyU5oyirey4vjbZ",
+    "workerUrl": "https://garage-sale-auth.luciopeke.workers.dev"
   }
 }

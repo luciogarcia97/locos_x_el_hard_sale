@@ -434,15 +434,6 @@ app-product-card { display: block; }
 .adm input::placeholder, .adm textarea::placeholder { color: #625a75; }
 .adm select option { background: var(--panel); }
 
-/* connect */
-.adm-connect { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: start; }
-.adm-lead { margin-top: 14px; color: var(--text-2); max-width: 60ch; }
-.adm-howto { margin: 20px 0 0; padding-left: 1.3em; display: grid; gap: 8px; color: var(--text-2); max-width: 62ch; }
-.adm-howto li::marker { font-family: var(--display); font-weight: 800; color: var(--pink); }
-.adm-howto a { color: var(--cyan); }
-.adm-howto em { font-style: normal; font-weight: 600; color: var(--text); }
-.adm-connect .adm-form { border: 1px solid transparent; background: linear-gradient(var(--panel), var(--panel)) padding-box, var(--edge) border-box; }
-
 /* list */
 .adm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .adm-row {
@@ -505,7 +496,7 @@ app-product-card { display: block; }
 .adm-spacer { flex: 1; }
 
 @media (max-width: 860px) {
-  .adm-connect, .adm-grid { grid-template-columns: 1fr; }
+  .adm-grid { grid-template-columns: 1fr; }
   .adm-row { grid-template-columns: 28px 56px minmax(0, 1fr) auto; row-gap: 6px; }
   .adm-order, .adm-thumb { grid-row: 1 / span 3; }
   .adm-thumb { width: 56px; }
@@ -518,6 +509,46 @@ app-product-card { display: block; }
   .adm-grid > .adm-form { grid-template-columns: 1fr; }
   .adm-bar-actions { width: 100%; }
 }
+
+/* ---------- Session: Panel button, login screen ---------- */
+.session-chip {
+  position: absolute; top: 16px; right: 16px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 14px 4px 4px; border-radius: 999px;
+  font-weight: 600; font-size: .92rem; text-decoration: none;
+  border: 1px solid transparent;
+  background: linear-gradient(rgba(14, 10, 22, .92), rgba(14, 10, 22, .92)) padding-box, var(--edge) border-box;
+  transition: box-shadow .15s ease;
+}
+.session-chip:hover { box-shadow: 0 0 22px -4px rgba(255, 62, 181, .5); }
+.session-chip img { border-radius: 50%; }
+
+.footer-login { margin-left: auto; font-size: .85rem; color: var(--muted); text-decoration: none; }
+.footer-login:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+.login {
+  min-height: 100dvh; display: grid; place-items: center; padding: 32px 16px;
+  background:
+    radial-gradient(50% 50% at 30% 40%, rgba(255, 62, 181, .12), transparent 70%),
+    radial-gradient(50% 50% at 70% 60%, rgba(34, 199, 240, .1), transparent 70%),
+    var(--night);
+}
+.login-card {
+  width: min(460px, 100%); padding: 32px 28px; border-radius: 20px; text-align: center;
+  display: grid; gap: 14px; justify-items: center;
+  border: 1px solid transparent;
+  background: linear-gradient(var(--panel), var(--panel)) padding-box, var(--edge) border-box;
+}
+.login-logo img { border-radius: 18px; }
+.login h1 { font-family: var(--display); font-weight: 900; font-size: 2.2rem; line-height: 1; }
+.login p { color: var(--text-2); max-width: 40ch; }
+.login code { font-size: .85em; color: var(--cyan); }
+.login .adm-msg { margin: 0; width: 100%; text-align: left; }
+.login-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 6px; }
+.btn-github svg { width: 18px; height: 18px; fill: currentColor; }
+
+.adm-user { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--text-2); padding-left: 6px; }
+.adm-user img { border-radius: 50%; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 980px) {

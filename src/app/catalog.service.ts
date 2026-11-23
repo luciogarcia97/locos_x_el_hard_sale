@@ -35,12 +35,14 @@ export class CatalogService {
       ]);
       this.products.set(products);
       this.config.set(config);
+      return config as SiteConfig;
     } catch (e) {
       console.error(e);
       this.error.set('No pudimos cargar los productos. Probá recargar la página.');
     } finally {
       this.loading.set(false);
     }
+    return null;
   }
 
   isFavorite(id: string) {

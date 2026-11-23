@@ -1,14 +1,23 @@
 @let cfg = catalog.config();
 
-@if (isAdmin()) {
+@if (route() === 'admin' && auth.isAdmin()) {
   @defer (on immediate) {
     <app-admin />
   } @loading (minimum 200ms) {
     <p class="state">Abriendo el panel…</p>
   }
+} @else if (route() !== 'home') {
+  <!-- #login, or #admin while checking the account / without permission -->
+  <app-login />
 } @else {
 
   <header class="hero" #hero>
+    @if (auth.isAdmin() && auth.user(); as u) {
+      <a class="session-chip" href="#admin">
+        <img [src]="u.avatarUrl + '&s=64'" alt="" width="28" height="28" />
+        Panel
+      </a>
+    }
     <div class="floor floor-pink" aria-hidden="true"></div>
     <div class="floor floor-cyan" aria-hidden="true"></div>
     <div class="container hero-inner">
@@ -118,6 +127,9 @@
           </nav>
         }
       </div>
+      @if (!auth.isAdmin() && auth.status() !== 'unconfigured') {
+        <a class="footer-login" href="#login">Ingresar</a>
+      }
     </div>
   </footer>
 

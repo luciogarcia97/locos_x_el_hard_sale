@@ -9,24 +9,65 @@ mensaje listo y le abre el Instagram de Locos (o WhatsApp, si se configura) para
 
 ## Panel de administración
 
-Entrando a `<url-de-la-web>/#admin` se abre un panel para **agregar, editar, eliminar y reordenar productos**,
-cambiar su estado (disponible / reservado / vendido) y **subir fotos** (se achican a 1200 px y se convierten a WebP
-en el navegador). Los cambios se acumulan y se suben todos juntos con **Publicar cambios**: el panel hace un único
-commit en el repo y GitHub Pages republica la web sola en 1 o 2 minutos.
+En `<url-de-la-web>/#admin` hay un panel para **agregar, editar, eliminar y reordenar productos**, cambiar su estado
+(disponible / reservado / vendido) y **subir fotos** (se achican a 1200 px y se convierten a WebP en el navegador).
+Los cambios se acumulan y se suben todos juntos con **Publicar cambios**: el panel hace un único commit en el repo y
+GitHub Pages republica la web sola en 1 o 2 minutos.
 
-No hay backend: el panel habla directo con la API de GitHub. Para conectarlo hace falta, una sola vez:
+### Quién puede entrar
 
-1. Crear una clave en https://github.com/settings/personal-access-tokens/new (*fine-grained token*).
-2. *Repository access* → *Only select repositories* → elegir el repo de la web.
-3. *Permissions* → *Repository permissions* → *Contents*: **Read and write**. Nada más.
-4. Abrir `/#admin`, completar usuario, repo y rama, y pegar la clave.
+- Se entra con **"Ingresar con GitHub"** (link "Ingresar" en el footer, o directamente `/#admin`).
+- Sin sesión, `/#admin` redirige a `/#login`. Después de ingresar vuelve solo al panel.
+- **Son admins los colaboradores del repo con permiso de escritura.** Para sumar o quitar uno:
+  repo → *Settings → Collaborators → Add people*. No hay otra lista que mantener.
+- Una cuenta que no es colaboradora ve "Esta cuenta no es administradora" y no puede publicar: GitHub rechaza
+  sus cambios aunque fuerce la entrada al panel.
+- Los admins logueados ven un botón **Panel** arriba a la derecha de la web.
+- La sesión dura ~6 meses por navegador (se renueva sola); *Salir* la cierra.
 
-La clave queda guardada en ese navegador (usarlo solo en una compu propia; *Desconectar* la borra). Si vence o se
-filtra, se revoca desde la misma página de GitHub y se genera otra. Para que el formulario venga pre-completado,
-cargá `github.owner` / `github.repo` / `github.branch` en `public/data/config.json`.
+### Ingreso de administradores (configuración, una sola vez)
 
-Si el catálogo se modifica desde otro lado (otro navegador o la web de GitHub) mientras editás, el panel no pisa
-esos cambios: avisa y pide recargar.
+Son dos piezas gratuitas: una **GitHub App** (da el login y limita el acceso a este repo) y un **Cloudflare Worker**
+(`worker/index.js`, guarda el secreto de la app, que no puede estar en la web pública).
+
+**1. Crear la GitHub App** — https://github.com/settings/apps/new
+
+| Campo | Valor |
+|---|---|
+| GitHub App name | `Garage Sale Locos` (cualquiera libre) |
+| Homepage URL | `https://luciogarcia97.github.io/locos_x_el_hard_sale/` |
+| Redirect URI (antes "Callback URL") | `https://luciogarcia97.github.io/locos_x_el_hard_sale/` y, con *Add redirect URI*, `http://localhost:4200/` para probar local. Sin *wildcard matching* |
+| Expire user authorization tokens | ✔ (dejar marcado) |
+| Request user authorization (OAuth) during installation | sin marcar |
+| Webhook → Active | **desmarcar** |
+| Repository permissions → Contents | **Read and write** (el resto sin acceso) |
+| Where can this GitHub App be installed? | Only on this account |
+
+Después de crearla:
+- Copiar el **Client ID**.
+- *Generate a new client secret* y copiarlo (se muestra una sola vez).
+- En el menú de la app, *Install App* → tu cuenta → *Only select repositories* → `locos_x_el_hard_sale`.
+
+**2. Crear el Worker** — https://dash.cloudflare.com (cuenta gratis)
+
+1. *Workers & Pages → Create → Create Worker* → nombre `garage-sale-auth` → *Deploy*.
+2. *Edit code*: borrar todo, pegar el contenido de `worker/index.js` y *Deploy*.
+3. *Settings → Variables and Secrets* → agregar:
+   - `GITHUB_CLIENT_ID` (Text) = el Client ID
+   - `GITHUB_CLIENT_SECRET` (**Secret**) = el client secret
+   - `ALLOWED_ORIGINS` (Text) = `https://luciogarcia97.github.io,http://localhost:4200`
+4. Copiar la URL del Worker (tipo `https://garage-sale-auth.<tu-subdominio>.workers.dev`).
+
+**3. Conectar la web** — en `public/data/config.json`:
+
+```json
+"auth": {
+  "clientId": "Iv23li…",
+  "workerUrl": "https://garage-sale-auth.<tu-subdominio>.workers.dev"
+}
+```
+
+Commit + push y listo. El Client ID y la URL del Worker son públicos a propósito; el único secreto está en Cloudflare.
 
 ## Cómo editar los productos (sin tocar código)
 
