@@ -101,7 +101,9 @@
     "condition": "Completo, como nuevo",
     "price": 140000,
     "status": "disponible",
-    "images": [],
+    "images": [
+      "images/products/redragon-teclado-redragon-uranus-pro-k737-mwtgitgmxfj.webp"
+    ],
     "highlights": [
       "Gama alta Redragon"
     ],
