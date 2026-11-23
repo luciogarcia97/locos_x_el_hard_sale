@@ -72,7 +72,9 @@
     "condition": "Completo, como nuevo",
     "price": 68000,
     "status": "disponible",
-    "images": [],
+    "images": [
+      "images/products/eweadn-teclado-eweadn-x87-rosa-gris-mwtgea6lxyz.webp"
+    ],
     "highlights": [
       "TKL",
       "Colorway rosa/gris"
