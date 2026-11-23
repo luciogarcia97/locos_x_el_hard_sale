@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["ng", "serve", "--port", "4200"],
       "port": 4200
+    },
+    {
+      "name": "garage-sale-dist",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "http-server@14.1.1", "dist/garage-sale/browser", "-p", "4300", "-c-1", "-s"],
+      "port": 4300
     }
   ]
 }
