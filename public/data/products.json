@@ -1,37 +1,5 @@
 [
   {
-    "id": "rk-m75he",
-    "name": "Teclado Royal Kludge M75HE Magnético",
-    "brand": "Royal Kludge",
-    "category": "Teclados",
-    "origin": "Nuevo de review",
-    "condition": "Completo, como nuevo",
-    "price": 80000,
-    "status": "vendido",
-    "images": [],
-    "highlights": [
-      "Switches magnéticos",
-      "Formato 75%",
-      "Cableado"
-    ],
-    "specs": [
-      {
-        "label": "Formato",
-        "value": "75%"
-      },
-      {
-        "label": "Switches",
-        "value": "Magnéticos (Hall Effect)"
-      },
-      {
-        "label": "Conexión",
-        "value": "Cableado USB-C"
-      }
-    ],
-    "description": "Teclado magnético con actuación ajustable. Se usó solamente para la review.",
-    "reviewUrl": ""
-  },
-  {
     "id": "rk-r99-halo",
     "name": "Teclado Royal Kludge RK R99 Halo Inalámbrico",
     "brand": "Royal Kludge",
@@ -40,7 +8,11 @@
     "condition": "Completo, como nuevo",
     "price": 130000,
     "status": "disponible",
-    "images": [],
+    "images": [
+      "images/products/royal-kludge-teclado-royal-kludge-rk-r99-halo-inalambrico-mwurbd7paey.webp",
+      "images/products/royal-kludge-teclado-royal-kludge-rk-r99-halo-inalambrico-mwurbl71jbq.webp",
+      "images/products/royal-kludge-teclado-royal-kludge-rk-r99-halo-inalambrico-mwurbnw9dy3.webp"
+    ],
     "highlights": [
       "Inalámbrico",
       "Formato 96%",
@@ -181,28 +153,6 @@
     "reviewUrl": ""
   },
   {
-    "id": "redragon-vibecore",
-    "name": "Auriculares Redragon Vibecore Black",
-    "brand": "Redragon",
-    "category": "Auriculares",
-    "origin": "Nuevo de review",
-    "condition": "Completo, como nuevo",
-    "price": 50000,
-    "status": "vendido",
-    "images": [],
-    "highlights": [
-      "Color negro"
-    ],
-    "specs": [
-      {
-        "label": "Color",
-        "value": "Negro"
-      }
-    ],
-    "description": "Completos con caja.",
-    "reviewUrl": ""
-  },
-  {
     "id": "rk-hg103-shinden",
     "name": "Auriculares RK HG103 Edición Shinden (Negro/Violeta)",
     "brand": "Royal Kludge",
@@ -228,5 +178,59 @@
     ],
     "description": "Edición especial con diseño Shinden.",
     "reviewUrl": "https://youtu.be/eN30f7fYW7g?t=336"
+  },
+  {
+    "id": "rk-m75he",
+    "name": "Teclado Royal Kludge M75HE Magnético",
+    "brand": "Royal Kludge",
+    "category": "Teclados",
+    "origin": "Nuevo de review",
+    "condition": "Completo, como nuevo",
+    "price": 80000,
+    "status": "vendido",
+    "images": [],
+    "highlights": [
+      "Switches magnéticos",
+      "Formato 75%",
+      "Cableado"
+    ],
+    "specs": [
+      {
+        "label": "Formato",
+        "value": "75%"
+      },
+      {
+        "label": "Switches",
+        "value": "Magnéticos (Hall Effect)"
+      },
+      {
+        "label": "Conexión",
+        "value": "Cableado USB-C"
+      }
+    ],
+    "description": "Teclado magnético con actuación ajustable. Se usó solamente para la review.",
+    "reviewUrl": ""
+  },
+  {
+    "id": "redragon-vibecore",
+    "name": "Auriculares Redragon Vibecore Black",
+    "brand": "Redragon",
+    "category": "Auriculares",
+    "origin": "Nuevo de review",
+    "condition": "Completo, como nuevo",
+    "price": 50000,
+    "status": "vendido",
+    "images": [],
+    "highlights": [
+      "Color negro"
+    ],
+    "specs": [
+      {
+        "label": "Color",
+        "value": "Negro"
+      }
+    ],
+    "description": "Completos con caja.",
+    "reviewUrl": ""
   }
 ]
