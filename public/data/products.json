@@ -97,7 +97,11 @@
     "condition": "Completo, como nuevo",
     "price": 60000,
     "status": "disponible",
-    "images": [],
+    "images": [
+      "images/products/redragon-teclado-redragon-kumara-magnetico-mwurse0xfdv.webp",
+      "images/products/redragon-teclado-redragon-kumara-magnetico-mwursgiqnk7.webp",
+      "images/products/redragon-teclado-redragon-kumara-magnetico-mwursidi7ba.webp"
+    ],
     "highlights": [
       "Switches magnéticos",
       "TKL"
@@ -124,7 +128,12 @@
     "condition": "Completo, como nuevo",
     "price": 240000,
     "status": "disponible",
-    "images": [],
+    "images": [
+      "images/products/asus-rog-teclado-asus-rog-azoth-wireless-white-mx-storm-mwurp6fgl0c.webp",
+      "images/products/asus-rog-teclado-asus-rog-azoth-wireless-white-mx-storm-mwurpfqylpp.webp",
+      "images/products/asus-rog-teclado-asus-rog-azoth-wireless-white-mx-storm-mwurpjzod12.webp",
+      "images/products/asus-rog-teclado-asus-rog-azoth-wireless-white-mx-storm-mwurpn70v9y.webp"
+    ],
     "highlights": [
       "Inalámbrico",
       "Formato 75%",
@@ -150,7 +159,7 @@
       }
     ],
     "description": "Teclado premium de ROG en versión blanca. Usado, en excelente estado.",
-    "reviewUrl": ""
+    "reviewUrl": "https://www.youtube.com/watch?v=4ObX7VsKuRs"
   },
   {
     "id": "rk-hg103-shinden",
@@ -161,7 +170,11 @@
     "condition": "Completo, como nuevo",
     "price": 75000,
     "status": "disponible",
-    "images": [],
+    "images": [
+      "images/products/royal-kludge-auriculares-rk-hg103-edicion-shinden-negro-viol-mwurijpjytu.webp",
+      "images/products/royal-kludge-auriculares-rk-hg103-edicion-shinden-negro-viol-mwurimwuuvv.webp",
+      "images/products/royal-kludge-auriculares-rk-hg103-edicion-shinden-negro-viol-mwuriothaws.webp"
+    ],
     "highlights": [
       "Edición especial Shinden",
       "Negro / Violeta"
