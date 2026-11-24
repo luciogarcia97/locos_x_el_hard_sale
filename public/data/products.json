@@ -76,7 +76,9 @@
     "price": 140000,
     "status": "disponible",
     "images": [
-      "images/products/redragon-teclado-redragon-uranus-pro-k737-mwtgitgmxfj.webp"
+      "images/products/redragon-teclado-redragon-uranus-pro-k737-mwtgitgmxfj.webp",
+      "images/products/redragon-teclado-redragon-uranus-pro-k737-mwus1hhopzl.webp",
+      "images/products/redragon-teclado-redragon-uranus-pro-k737-mwus1jrg9os.webp"
     ],
     "highlights": [
       "Gama alta Redragon"
@@ -85,6 +87,10 @@
       {
         "label": "Modelo",
         "value": "K737 Uranus Pro"
+      },
+      {
+        "label": "Conexion",
+        "value": "2.4 GHz / Bluetooth / USB-C"
       }
     ],
     "description": "Completo con caja y accesorios.",
