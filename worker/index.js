@@ -13,7 +13,7 @@
  *   GITHUB_CLIENT_ID      (texto)   Client ID de la GitHub App
  *   GITHUB_CLIENT_SECRET  (secreto) Client secret de la GitHub App
  *   ALLOWED_ORIGINS       (texto)   Orígenes permitidos separados por coma, ej.
- *                                   https://luciogarcia97.github.io,http://localhost:4200
+ *                                   https://locosporelhardware.pages.dev,http://localhost:4200
  *   GITHUB_REPO           (texto)   owner/repo cuyos colaboradores son admins, ej.
  *                                   luciogarcia97/locos_x_el_hard_sale
  * Bindings (Settings → Bindings → KV namespace):

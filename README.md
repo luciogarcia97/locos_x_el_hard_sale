@@ -12,7 +12,7 @@ mensaje listo y le abre el Instagram de Locos (o WhatsApp, si se configura) para
 En `<url-de-la-web>/#admin` hay un panel para **agregar, editar, eliminar y reordenar productos**, cambiar su estado
 (disponible / reservado / vendido) y **subir fotos** (se achican a 1200 px y se convierten a WebP en el navegador).
 Los cambios se acumulan y se suben todos juntos con **Publicar cambios**: el panel hace un único commit en el repo y
-GitHub Pages republica la web sola en 1 o 2 minutos.
+Cloudflare Pages republica la web sola en 1 o 2 minutos.
 
 ### Quién puede entrar
 
@@ -35,13 +35,13 @@ Son dos piezas gratuitas: una **GitHub App** (da el login y limita el acceso a e
 | Campo | Valor |
 |---|---|
 | GitHub App name | `Garage Sale Locos` (cualquiera libre) |
-| Homepage URL | `https://luciogarcia97.github.io/locos_x_el_hard_sale/` |
-| Redirect URI (antes "Callback URL") | `https://luciogarcia97.github.io/locos_x_el_hard_sale/` y, con *Add redirect URI*, `http://localhost:4200/` para probar local. Sin *wildcard matching* |
+| Homepage URL | `https://locosporelhardware.pages.dev/` |
+| Redirect URI (antes "Callback URL") | `https://locosporelhardware.pages.dev/` y, con *Add redirect URI*, `http://localhost:4200/` para probar local. Sin *wildcard matching* |
 | Expire user authorization tokens | ✔ (dejar marcado) |
 | Request user authorization (OAuth) during installation | sin marcar |
 | Webhook → Active | **desmarcar** |
 | Repository permissions → Contents | **Read and write** (el resto sin acceso) |
-| Where can this GitHub App be installed? | Only on this account |
+| Where can this GitHub App be installed? | *Only on this account*. Si un colaborador no puede autorizar la app al ingresar, hacerla pública (*Advanced → Make public*): publicar sigue exigiendo permiso de escritura en el repo |
 
 Después de crearla:
 - Copiar el **Client ID**.
@@ -55,7 +55,7 @@ Después de crearla:
 3. *Settings → Variables and Secrets* → agregar:
    - `GITHUB_CLIENT_ID` (Text) = el Client ID
    - `GITHUB_CLIENT_SECRET` (**Secret**) = el client secret
-   - `ALLOWED_ORIGINS` (Text) = `https://luciogarcia97.github.io,http://localhost:4200`
+   - `ALLOWED_ORIGINS` (Text) = `https://locosporelhardware.pages.dev,http://localhost:4200`
 4. Copiar la URL del Worker (tipo `https://garage-sale-auth.<tu-subdominio>.workers.dev`).
 
 **3. Conectar la web** — en `public/data/config.json`:
@@ -136,33 +136,22 @@ npm start        # http://localhost:4200
 npm run build    # genera dist/garage-sale/browser
 ```
 
-## Publicar gratis
+## Publicación (Cloudflare Pages)
 
-### Opción A — GitHub Pages (recomendada: gratis, y cada cambio se publica solo)
+La web vive en https://locosporelhardware.pages.dev/ y se republica sola con cada push a `main`.
+Configuración, una sola vez: Cloudflare → *Workers & Pages → Create → Pages → Connect to Git* → este repo.
 
-1. Crear una cuenta en github.com y un repositorio nuevo (público), ej. `garage-sale`.
-2. Subir este proyecto:
-   ```bash
-   git init
-   git add .
-   git commit -m "Garage sale inicial"
-   git branch -M main
-   git remote add origin https://github.com/<usuario>/garage-sale.git
-   git push -u origin main
-   ```
-3. En el repo: **Settings → Pages → Source: GitHub Actions**.
-4. El workflow `.github/workflows/deploy.yml` construye y publica. La URL queda tipo
-   `https://<usuario>.github.io/garage-sale/`.
+| Campo | Valor |
+|---|---|
+| Project name | `locosporelhardware` (define la URL) |
+| Production branch | `main` |
+| Framework preset | None |
+| Build command | `npx ng build` |
+| Build output directory | `dist/garage-sale/browser` |
+| Variable `NODE_VERSION` | `22` |
 
-### Opción B — Netlify Drop (sin Git, en 1 minuto)
-
-1. `npm run build`
-2. Entrar a https://app.netlify.com/drop y arrastrar la carpeta `dist/garage-sale/browser`.
-3. Te da una URL `https://<nombre>.netlify.app`. Para actualizar, volvés a arrastrar la carpeta.
-
-### Opción C — Cloudflare Pages / Vercel
-
-Conectar el repo de GitHub. Build command: `npx ng build` · Output: `dist/garage-sale/browser`.
+La dirección vieja de GitHub Pages solo redirige a la nueva (`legacy-pages/`, publicado por
+`.github/workflows/deploy.yml`). No desactivar Pages en el repo o se rompen los links ya compartidos.
 
 > El `<base href="./">` es relativo, así que el sitio funciona igual en cualquiera de estos hosts
 > o en un subdirectorio, sin configurar nada.

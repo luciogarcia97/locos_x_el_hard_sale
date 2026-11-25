@@ -15,7 +15,7 @@ export const IMAGES_DIR = 'images/products';
  * Talks to the GitHub REST API from the browser with the logged-in admin's token.
  * Reads the catalog straight from the repo (always the latest version, not the
  * deployed copy) and publishes every change as a single commit, which triggers
- * the GitHub Pages deploy workflow.
+ * the Cloudflare Pages deploy.
  */
 @Injectable({ providedIn: 'root' })
 export class GithubService {
