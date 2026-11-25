@@ -150,8 +150,5 @@ Configuración, una sola vez: Cloudflare → *Workers & Pages → Create → Pag
 | Build output directory | `dist/garage-sale/browser` |
 | Variable `NODE_VERSION` | `22` |
 
-La dirección vieja de GitHub Pages solo redirige a la nueva (`legacy-pages/`, publicado por
-`.github/workflows/deploy.yml`). No desactivar Pages en el repo o se rompen los links ya compartidos.
-
 > El `<base href="./">` es relativo, así que el sitio funciona igual en cualquiera de estos hosts
 > o en un subdirectorio, sin configurar nada.
